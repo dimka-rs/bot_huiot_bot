@@ -10,6 +10,7 @@ import logging
 TOKEN_FILE="./TOKEN"
 LOG_FILE="./bot.log"
 vovels = 'аеийоуэя'
+fixed_words = {'нет':'пидора ответ', 'мама':'не шути так', 'папа':'не смей'}
 
 #logging.basicConfig(filename=LOG_FILE,level=logging.DEBUG)
 logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
@@ -56,14 +57,20 @@ def startCommand(bot, update):
 def textMessage(bot, update):
     doLog(bot, update)
     response = 'GTFO'
-    lastword = update.message.text.split(' ')[-1]
-    for c in lastword:
-        found = vovels.find(c)
-        if not found == -1:
-            pos = lastword.find(c)
-            response = 'хуй' + lastword[pos+1:]
-            break
-    
+    last_word = update.message.text.split(' ')[-1].lower()
+    if last_word in fixed_words:
+        response = fixed_words[last_word]
+    else:
+        for c in last_word:
+            found = vovels.find(c)
+            if not found == -1:
+                pos = last_word.find(c)
+                response = 'хуй' + last_word[pos+1:]
+                break
+    logging.info(
+            "CHAT: " + str(update.message.chat_id)
+        + ". TEXT: " + str(response)
+        )
     bot.send_message(chat_id=update.message.chat_id, text=response)
 
 # handlers
